@@ -54,6 +54,17 @@ Ask a question:
 curl -X POST -F "msg=What is diabetes?" http://localhost:8080/get
 ```
 
+## One-File Study Version
+
+For memorizing the full flow in one place, see:
+
+```bash
+python simple_rag_one_file.py ingest
+python simple_rag_one_file.py ask "What is diabetes?"
+```
+
+That file repeats the whole RAG pipeline without the package structure.
+
 ## Memory Model
 
 Remember the flow as:
