@@ -5,7 +5,7 @@ This is a study-friendly rewrite of the original Flask + LangChain + Pinecone me
 The app has two steps:
 
 1. `python ingest.py` reads PDFs from `data/`, splits them into chunks, embeds them, and stores them in Pinecone.
-2. `python app.py` starts a Flask chat server that retrieves the best chunks and asks OpenAI to answer from that context.
+2. `python app.py` starts a Flask API that retrieves the best chunks and asks OpenAI to answer from that context.
 
 ## Project Map
 
@@ -21,8 +21,6 @@ medical_chatbot_clean/
     documents.py         # Load PDFs and split text
     prompts.py           # System prompt
     rag.py               # Embeddings, vector store, and RAG chain
-  templates/
-    chat.html            # Minimal browser UI
 ```
 
 ## Setup
@@ -44,13 +42,17 @@ Put your PDFs inside `data/`, then build the vector index:
 python ingest.py
 ```
 
-Start the chatbot:
+Start the API:
 
 ```bash
 python app.py
 ```
 
-Open `http://localhost:8080`.
+Ask a question:
+
+```bash
+curl -X POST -F "msg=What is diabetes?" http://localhost:8080/get
+```
 
 ## Memory Model
 

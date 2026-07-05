@@ -26,7 +26,7 @@ The original project is a basic RAG chatbot:
 - `src/documents.py`: one place for loading PDFs and splitting chunks.
 - `src/rag.py`: one place for embeddings, Pinecone, retriever, and chain creation.
 - `ingest.py`: only builds the Pinecone index.
-- `app.py`: only serves the web app and calls the RAG chain.
+- `app.py`: only exposes API routes and calls the RAG chain.
 
 ## Simple Version to Memorize
 
