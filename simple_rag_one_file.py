@@ -147,27 +147,27 @@ def ask(question):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage:")
-        print("  python simple_rag_one_file.py ingest")
-        print('  python simple_rag_one_file.py ask "What is diabetes?"')
+        print('Use:')
+        print('python simple_rag_one_file.py ingest')
+        print('python simple_rag_one_file.py ask "Your question"')
         return
 
     command = sys.argv[1]
 
     if command == "ingest":
         ingest_pdfs()
-        return
 
-    if command == "ask":
-        question = " ".join(sys.argv[2:]).strip()
+    elif command == "ask":
+        question = " ".join(sys.argv[2:])
 
         if not question:
-            raise RuntimeError("Please provide a question after 'ask'")
+            print("Please enter a question.")
+            return
 
         ask(question)
-        return
 
-    raise RuntimeError(f"Unknown command: {command}")
+    else:
+        print("Unknown command. Use 'ingest' or 'ask'.")
 
 
 if __name__ == "__main__":
