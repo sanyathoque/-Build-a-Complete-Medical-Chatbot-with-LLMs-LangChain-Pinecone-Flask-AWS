@@ -146,29 +146,108 @@ def ask(question):
 
 
 def main():
+    # sys.argv stores everything typed in the terminal as a Python list.
+    #
+    # Example:
+    #
+    # Terminal:
+    #   python simple_rag_one_file.py
+    #
+    # sys.argv becomes:
+    #   ["simple_rag_one_file.py"]
+    #
+    # The list contains only 1 item, so len(sys.argv) is 1.
+    #
+    # We need at least 2 items:
+    #   1. The Python filename
+    #   2. A command such as "ingest" or "ask"
+    #
+    # Therefore, len(sys.argv) < 2 means:
+    # "The user did not provide a command."
     if len(sys.argv) < 2:
-        print('Use:')
-        print('python simple_rag_one_file.py ingest')
-        print('python simple_rag_one_file.py ask "Your question"')
+
+        # Show the user the correct ways to run the program.
+        print("Usage:")
+        print("  python simple_rag_one_file.py ingest")
+        print('  python simple_rag_one_file.py ask "What is diabetes?"')
+
+        # Stop the main() function here.
+        # Without this return, the next line would try to access
+        # sys.argv[1], which does not exist when no command was provided.
         return
 
+    # sys.argv[0] is always the filename:
+    #   "simple_rag_one_file.py"
+    #
+    # sys.argv[1] is the first value after the filename.
+    #
+    # Example:
+    #
+    # Terminal:
+    #   python simple_rag_one_file.py ingest
+    #
+    # sys.argv becomes:
+    #   ["simple_rag_one_file.py", "ingest"]
+    #
+    # Therefore:
+    #   sys.argv[1] == "ingest"
+    #
+    # Another example:
+    #
+    # Terminal:
+    #   python simple_rag_one_file.py ask "What is diabetes?"
+    #
+    # sys.argv becomes:
+    #   [
+    #       "simple_rag_one_file.py",
+    #       "ask",
+    #       "What is diabetes?"
+    #   ]
+    #
+    # Therefore:
+    #   sys.argv[1] == "ask"
     command = sys.argv[1]
 
     if command == "ingest":
+        # Run the PDF ingestion process.
         ingest_pdfs()
 
     elif command == "ask":
-        question = " ".join(sys.argv[2:])
+        # sys.argv[2:] gets everything after the "ask" command.
+        #
+        # Example:
+        #   ["What", "is", "diabetes?"]
+        #
+        # " ".join(...) combines those items into one string:
+        #   "What is diabetes?"
+        #
+        # strip() removes unnecessary spaces from the beginning and end.
+        question = " ".join(sys.argv[2:]).strip()
 
+        # Check that the user actually entered a question.
         if not question:
             print("Please enter a question.")
             return
 
+        # Send the question to the RAG system.
         ask(question)
 
     else:
+        # This runs when the command is neither "ingest" nor "ask".
+        #
+        # Example:
+        #   python simple_rag_one_file.py delete
         print("Unknown command. Use 'ingest' or 'ask'.")
 
 
+# Python sets __name__ to "__main__" when this file is run directly.
+#
+# Example:
+#   python simple_rag_one_file.py ingest
+#
+# This condition then calls main() and starts the program.
+#
+# If this file is imported into another Python file, main() will not
+# automatically run.
 if __name__ == "__main__":
     main()
