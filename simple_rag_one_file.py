@@ -115,22 +115,17 @@ def build_rag_chain():
     )
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                """
-You are a careful medical question-answering assistant.
-Use only the context to answer.
-If the answer is not in the context, say you do not know.
-Keep the answer under three sentences.
-
-Context:
-{context}
-""",
-            ),
-            ("human", "{input}"),
-        ]
+    prompt = ChatPromptTemplate.from_template(
+    """Answer the medical question using only the context below.
+    If the answer is not in the context, say you do not know.
+    Use no more than three sentences.
+    
+    Context:
+    {context}
+    
+    Question:
+    {input}
+    """
     )
 
     llm = ChatOpenAI(
