@@ -139,8 +139,7 @@ def build_rag_chain():
 
 
 def ask(question):
-    rag_chain = build_rag_chain()
-    response = rag_chain.invoke({"input": question})
+    rag_chain = build_rag_chain().invoke({"input": question})
 
     print(response["answer"])
 
