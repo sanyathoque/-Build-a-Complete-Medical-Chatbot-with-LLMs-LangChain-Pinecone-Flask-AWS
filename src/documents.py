@@ -1,48 +1,38 @@
 from pathlib import Path
-from typing import List
 
 from langchain.schema import Document
-from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader
 
-from src.config import settings
-
-
-def load_pdf_documents(data_dir: str) -> List[Document]:
-    if not Path(data_dir).exists():
-        raise FileNotFoundError(f"PDF folder not found: {data_dir}")
-
-    loader = DirectoryLoader(
-        data_dir,
-        glob="*.pdf",
-        loader_cls=PyPDFLoader,
-    )
-    documents = loader.load()
-
-    return simplify_metadata(documents)
+from src.config import CHUNK_OVERLAP, CHUNK_SIZE
 
 
-def simplify_metadata(documents: List[Document]) -> List[Document]:
-    simple_documents = []
+def load_pdfs(pdf_folder: str) -> list[Document]:
+    documents = []
+    pdf_paths = list(Path(pdf_folder).glob("*.pdf"))
 
-    for document in documents:
-        simple_documents.append(
-            Document(
-                page_content=document.page_content,
-                metadata={
-                    "source": document.metadata.get("source", "unknown"),
-                    "page": document.metadata.get("page"),
-                },
-            )
-        )
+    print(f"Found {len(pdf_paths)} PDF files")
 
-    return simple_documents
+    for pdf_path in pdf_paths:
+        print(f"Loading {pdf_path.name}")
+        loader = PyPDFLoader(str(pdf_path))
+        pages = loader.load()
+
+        for page in pages:
+            page.metadata["source"] = pdf_path.name
+
+        documents.extend(pages)
+
+    print(f"Loaded {len(documents)} PDF pages")
+    return documents
 
 
-def split_documents(documents: List[Document]) -> List[Document]:
+def split_documents(documents: list[Document]) -> list[Document]:
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=settings.chunk_size,
-        chunk_overlap=settings.chunk_overlap,
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
     )
+    chunks = splitter.split_documents(documents)
 
-    return splitter.split_documents(documents)
+    print(f"Created {len(chunks)} text chunks")
+    return chunks

@@ -19,8 +19,7 @@ medical_chatbot_clean/
   src/
     config.py            # Settings from environment variables
     documents.py         # Load PDFs and split text
-    prompts.py           # System prompt
-    rag.py               # Embeddings, vector store, and RAG chain
+    rag.py               # Prompt, embeddings, vector store, and RAG chain
 ```
 
 ## Setup
