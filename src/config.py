@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
@@ -7,35 +6,29 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def require_env(name: str) -> str:
-    value = os.getenv(name)
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-    if not value:
-        raise RuntimeError(f"Missing required environment variable: {name}")
+INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "medical-chatbot")
+PINECONE_CLOUD = os.getenv("PINECONE_CLOUD", "aws")
+PINECONE_REGION = os.getenv("PINECONE_REGION", "us-east-1")
 
-    return value
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+EMBEDDING_MODEL = os.getenv(
+    "EMBEDDING_MODEL",
+    "sentence-transformers/all-MiniLM-L6-v2",
+)
+EMBEDDING_DIMENSION = 384
 
-
-@dataclass(frozen=True)
-class Settings:
-    pinecone_api_key: str = require_env("PINECONE_API_KEY")
-    openai_api_key: str = require_env("OPENAI_API_KEY")
-
-    index_name: str = os.getenv("PINECONE_INDEX_NAME", "medical-chatbot")
-    pinecone_cloud: str = os.getenv("PINECONE_CLOUD", "aws")
-    pinecone_region: str = os.getenv("PINECONE_REGION", "us-east-1")
-
-    openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o")
-    embedding_model: str = os.getenv(
-        "EMBEDDING_MODEL",
-        "sentence-transformers/all-MiniLM-L6-v2",
-    )
-    embedding_dimension: int = 384
-
-    pdf_data_dir: str = os.getenv("PDF_DATA_DIR", "data")
-    chunk_size: int = int(os.getenv("CHUNK_SIZE", "500"))
-    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "50"))
-    retriever_k: int = int(os.getenv("RETRIEVER_K", "3"))
+PDF_FOLDER = os.getenv("PDF_DATA_DIR", "data")
+CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "500"))
+CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "50"))
+RETRIEVER_K = int(os.getenv("RETRIEVER_K", "3"))
 
 
-settings = Settings()
+def check_keys() -> None:
+    if not PINECONE_API_KEY:
+        raise RuntimeError("Missing PINECONE_API_KEY in .env")
+
+    if not OPENAI_API_KEY:
+        raise RuntimeError("Missing OPENAI_API_KEY in .env")

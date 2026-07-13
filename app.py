@@ -1,20 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request
 
 from src.rag import build_rag_chain
 
 
 app = Flask(__name__)
 rag_chain = build_rag_chain()
-
-
-@app.get("/")
-def index():
-    return jsonify(
-        {
-            "name": "Medical Chatbot API",
-            "usage": "POST a form field named 'msg' to /get",
-        }
-    )
 
 
 @app.post("/get")
@@ -29,4 +19,4 @@ def chat():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080)

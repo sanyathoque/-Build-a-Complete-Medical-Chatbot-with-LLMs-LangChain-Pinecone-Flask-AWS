@@ -6,49 +6,58 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_pinecone import PineconeVectorStore
 
-from src.config import settings
-from src.prompts import SYSTEM_PROMPT
+from src.config import (
+    EMBEDDING_MODEL,
+    INDEX_NAME,
+    OPENAI_API_KEY,
+    OPENAI_MODEL,
+    RETRIEVER_K,
+    check_keys,
+)
 
 
-def build_embeddings() -> HuggingFaceEmbeddings:
-    return HuggingFaceEmbeddings(model_name=settings.embedding_model)
+def get_embeddings() -> HuggingFaceEmbeddings:
+    return HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
 
-def build_vector_store_from_documents(
+def upload_documents(
     documents: list[Document],
     embeddings: HuggingFaceEmbeddings,
-) -> PineconeVectorStore:
-    return PineconeVectorStore.from_documents(
+) -> None:
+    PineconeVectorStore.from_documents(
         documents=documents,
-        index_name=settings.index_name,
-        embedding=embeddings,
-    )
-
-
-def build_vector_store_from_existing_index(
-    embeddings: HuggingFaceEmbeddings,
-) -> PineconeVectorStore:
-    return PineconeVectorStore.from_existing_index(
-        index_name=settings.index_name,
+        index_name=INDEX_NAME,
         embedding=embeddings,
     )
 
 
 def build_rag_chain():
-    embeddings = build_embeddings()
-    vector_store = build_vector_store_from_existing_index(embeddings)
-    retriever = vector_store.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": settings.retriever_k},
-    )
+    check_keys()
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", SYSTEM_PROMPT),
-            ("human", "{input}"),
-        ]
+    embeddings = get_embeddings()
+    vector_store = PineconeVectorStore.from_existing_index(
+        index_name=INDEX_NAME,
+        embedding=embeddings,
     )
-    llm = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key)
+    retriever = vector_store.as_retriever(search_kwargs={"k": RETRIEVER_K})
+
+    prompt = ChatPromptTemplate.from_template(
+        """Answer the medical question using only the context below.
+If the answer is not in the context, say you do not know.
+Use no more than three sentences.
+
+Context:
+{context}
+
+Question:
+{input}
+"""
+    )
+    llm = ChatOpenAI(
+        model=OPENAI_MODEL,
+        api_key=OPENAI_API_KEY,
+        temperature=0,
+    )
     answer_chain = create_stuff_documents_chain(llm, prompt)
 
     return create_retrieval_chain(retriever, answer_chain)
